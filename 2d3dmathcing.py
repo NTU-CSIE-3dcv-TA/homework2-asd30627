@@ -27,7 +27,6 @@ def pnpsolver(query,model,cameraMatrix=0,distortion=0):
     cameraMatrix = np.array([[1868.27,0,540],[0,1869.18,960],[0,0,1]], dtype=np.float64)
     distCoeffs  = np.array([0.0847023,-0.192929,-0.000201144,-0.000725352], dtype=np.float64)
 
-    # ---- KNN matching + ratio test ----
     bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=False)
     matches = bf.knnMatch(desc_query, desc_model, k=2)
     good = []
@@ -76,13 +75,7 @@ def visualization(Camera2World_Transform_Matrixs, points3D_df,
                   up=(0, -1, 0),
                   lookat=None,
                   scale=1.0):
-    """
-    只做可視化：點雲 + 相機金字塔 + 相機軌跡
-    """
-    import numpy as np
-    import open3d as o3d
 
-    # --- point cloud ---
     xyz = np.vstack(points3D_df['XYZ'])
     rgb = np.vstack(points3D_df['RGB']) / 255.0
     pcd = o3d.geometry.PointCloud()
@@ -97,7 +90,6 @@ def visualization(Camera2World_Transform_Matrixs, points3D_df,
 
     geoms = [pcd]
 
-    # --- camera frustum (in camera frame) ---
     cam_pts = np.array([
         [0, 0, 0],
         [-1, -0.75, -2],
@@ -124,7 +116,6 @@ def visualization(Camera2World_Transform_Matrixs, points3D_df,
 
         traj.append(cam_world[0])  
 
-    # --- trajectory polyline ---
     if len(traj) >= 2:
         traj = np.asarray(traj)
         ls = o3d.geometry.LineSet()
@@ -135,7 +126,6 @@ def visualization(Camera2World_Transform_Matrixs, points3D_df,
         )
         geoms.append(ls)
 
-    # --- view ---
     if lookat is None:
         lookat = np.mean(np.asarray(pcd.points), axis=0)
 
